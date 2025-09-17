@@ -3,9 +3,12 @@ using UnityEngine;
 public class BulletCollision : MonoBehaviour 
 {
     public GameObject shooter; // 记录发射者
+    public int damage = 25; // 子弹伤害值
     
     void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log($"[调试] 子弹碰到了: {other.name}, Tag: {other.tag}");
+        
         // 如果击中的是发射者自己，忽略
         if (other.gameObject == shooter) 
         {
@@ -18,8 +21,18 @@ public class BulletCollision : MonoBehaviour
         {
             Debug.Log($"子弹击中了 {other.name}");
             
-            // 这里预留伤害处理接口，你后面可以添加
-            // TODO: 添加伤害处理逻辑
+            // 获取玩家的健康系统组件
+            HealthSystem healthSystem = other.GetComponent<HealthSystem>();
+            if (healthSystem != null)
+            {
+                // 造成伤害
+                healthSystem.TakeDamage(damage, shooter);
+                Debug.Log($"对 {other.name} 造成 {damage} 点伤害");
+            }
+            else
+            {
+                Debug.LogWarning($"玩家 {other.name} 没有HealthSystem组件！");
+            }
             
             // 销毁子弹
             Destroy(gameObject);
@@ -37,6 +50,7 @@ public class BulletCollision : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         Collider2D other = collision.collider;
+        Debug.Log($"[调试] 子弹碰撞了: {other.name}, Tag: {other.tag}");
         
         // 如果击中的是发射者自己，忽略
         if (other.gameObject == shooter) 
@@ -50,8 +64,18 @@ public class BulletCollision : MonoBehaviour
         {
             Debug.Log($"子弹击中了 {other.name}");
             
-            // 预留伤害处理接口
-            // TODO: 添加伤害处理逻辑
+            // 获取玩家的健康系统组件
+            HealthSystem healthSystem = other.gameObject.GetComponent<HealthSystem>();
+            if (healthSystem != null)
+            {
+                // 造成伤害
+                healthSystem.TakeDamage(damage, shooter);
+                Debug.Log($"对 {other.name} 造成 {damage} 点伤害");
+            }
+            else
+            {
+                Debug.LogWarning($"玩家 {other.name} 没有HealthSystem组件！");
+            }
             
             // 销毁子弹
             Destroy(gameObject);

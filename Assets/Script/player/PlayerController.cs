@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 // 玩家控制器 - 处理移动、跳跃和平台穿透
 public class PlayerController : MonoBehaviour
@@ -24,7 +25,7 @@ public class PlayerController : MonoBehaviour
     private bool isHeadGrounded; // 头顶是否碰到平台
     
     [Header("Phase Settings")]
-    public float phaseDuration = 0.1f; // 穿透持续时间
+    public float phaseDuration = 0.5f; // 穿透持续时间
     public float minPhaseVelocity = 0.1f; // 最小穿透速度
     private bool isPhasing = false; // 是否正在穿透
     private float phaseTimer = 0f; // 穿透计时器
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviour
     
     void Update()
     {
+        
         // 检测地面
         RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundLayer);
         isGrounded = hit.collider != null;
@@ -92,16 +94,24 @@ public class PlayerController : MonoBehaviour
             currentJumps = 0;
         }
 
-        // 水平移动
-        float horizontalInput = Input.GetAxis("Horizontal");
+        // 水平移动 - 只使用WASD键
+        float horizontalInput = 0f;
+        if (Input.GetKey(KeyCode.A))
+        {
+            horizontalInput = -1f;
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            horizontalInput = 1f;
+        }
         
         if (rb != null)
         {
             rb.velocity = new Vector2(horizontalInput * movespeed, rb.velocity.y);
         }
 
-        // 跳跃输入
-        if (Input.GetButtonDown("Jump"))
+        // 跳跃输入 - 使用W键
+        if (Input.GetKeyDown(KeyCode.W))
         {
             Jump();
         }
